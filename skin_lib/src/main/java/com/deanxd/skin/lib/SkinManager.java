@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.LayoutInflaterCompat;
 
+import com.deanxd.skin.lib.core.SkinFactory;
 import com.deanxd.skin.lib.listener.ISkinnableView;
 import com.deanxd.skin.lib.utils.ActionBarUtils;
 import com.deanxd.skin.lib.utils.NavigationUtils;
@@ -33,9 +34,11 @@ public class SkinManager {
     private static HashSet<WeakReference<Activity>> mHashSet = new HashSet<>();
 
     public static void register(Activity activity) {
+        //为当前Activity设置 布局解析监听
         LayoutInflater inflater = LayoutInflater.from(activity);
-        LayoutInflaterCompat.setFactory2(inflater, mSkinFactory);
+        LayoutInflaterCompat.setFactory2(inflater, new SkinFactory(activity));
 
+        //缓存注册过的activity, 在改变参数时，全局界面改变
         WeakReference<Activity> reference = new WeakReference<>(activity);
         mHashSet.add(reference);
     }
@@ -60,6 +63,9 @@ public class SkinManager {
         notifySkinChanged(nightMode);
     }
 
+    /**
+     * 通知 皮肤改变
+     */
     private static void notifySkinChanged(@AppCompatDelegate.NightMode int nightMode) {
         final boolean isPost21 = Build.VERSION.SDK_INT >= 21;
         for (WeakReference<Activity> reference : mHashSet) {
@@ -82,6 +88,9 @@ public class SkinManager {
         }
     }
 
+    /**
+     * 循环view集合，根据当前配置 设置样式
+     */
     private static void applyDayNightForView(View view) {
         if (view instanceof ISkinnableView) {
             ISkinnableView viewsMatch = (ISkinnableView) view;
@@ -94,47 +103,6 @@ public class SkinManager {
             for (int i = 0; i < childCount; i++) {
                 applyDayNightForView(parent.getChildAt(i));
             }
-        }
-    }
-
-    private static LayoutInflater.Factory2 mSkinFactory = new LayoutInflater.Factory2() {
-        @Override
-        public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
-            View view = null;
-            switch (name) {
-                case "LinearLayout":
-                    view = new SkinnableLinearLayout(context, attrs);
-                    verifyNotNull(view, name);
-                    break;
-                case "RelativeLayout":
-                    view = new SkinnableRelativeLayout(context, attrs);
-                    verifyNotNull(view, name);
-                    break;
-                case "TextView":
-                    view = new SkinnableTextView(context, attrs);
-                    verifyNotNull(view, name);
-                    break;
-                case "ImageView":
-                    view = new SkinnableImageView(context, attrs);
-                    verifyNotNull(view, name);
-                    break;
-                case "Button":
-                    view = new SkinnableButton(context, attrs);
-                    verifyNotNull(view, name);
-                    break;
-            }
-            return view;
-        }
-
-        @Override
-        public View onCreateView(String name, Context context, AttributeSet attrs) {
-            return null;
-        }
-    };
-
-    private static void verifyNotNull(View view, String name) {
-        if (view == null) {
-            throw new IllegalStateException(SkinManager.class.getName() + " asked to inflate view for <" + name + ">, but returned null");
         }
     }
 }

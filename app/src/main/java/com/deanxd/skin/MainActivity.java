@@ -25,4 +25,5 @@ public class MainActivity extends BaseActivity {
     public void openActivity(View view) {
         startActivity(new Intent(this, SecondActivity.class));
     }
+
 }
