@@ -59,9 +59,14 @@ public class SkinManager {
         }
     }
 
+    public static void installSkin(String skinFilePath) {
+
+    }
+
     public static void setDayNightMode(@AppCompatDelegate.NightMode int nightMode) {
         notifySkinChanged(nightMode);
     }
+
 
     /**
      * 通知 皮肤改变
