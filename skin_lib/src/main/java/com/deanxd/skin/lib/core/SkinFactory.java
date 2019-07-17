@@ -53,7 +53,7 @@ public class SkinFactory implements LayoutInflater.Factory2 {
                 break;
         }
 
-        if (mActivity instanceof AppCompatActivity) {
+        if (view == null && mActivity instanceof AppCompatActivity) {
             AppCompatDelegate delegate = ((AppCompatActivity) mActivity).getDelegate();
             return delegate.createView(parent, name, context, attrs);
         }
