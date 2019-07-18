@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat;
 import com.deanxd.skin.R;
 import com.deanxd.skin.lib.SkinManager;
 import com.deanxd.skin.lib.bean.AttrsBean;
+import com.deanxd.skin.lib.core.SkinResource;
 import com.deanxd.skin.lib.listener.ISkinnableView;
 
 public class CustomCircleView extends View implements ISkinnableView {
@@ -65,21 +66,16 @@ public class CustomCircleView extends View implements ISkinnableView {
         canvas.drawCircle(width, height, radius, mTextPain);
     }
 
-
     @Override
     public void updateSkin() {
         // 根据自定义属性，获取styleable中的circleColor属性
-//        int key = R.styleable.CustomCircleView[0]; // = R.styleable.CustomCircleView_circleColor
-//        int resourceId = attrsBean.getViewResource(key);
-//        if (resourceId > 0) {
-//            if (SkinManager.getInstance().isDefaultSkin()) {
-//                int color = ContextCompat.getColor(getContext(), resourceId);
-//                mTextPain.setColor(color);
-//            } else {
-//                int color = SkinManager.getInstance().getColor(resourceId);
-//                mTextPain.setColor(color);
-//            }
-//        }
-//        invalidate();
+        int key = R.styleable.CustomCircleView[0]; // = R.styleable.CustomCircleView_circleColor
+        int resourceId = attrsBean.getViewResource(key);
+        if (resourceId > 0) {
+            SkinResource skinResource = SkinManager.getSkinResource();
+            int color = skinResource.getColor(resourceId);
+            mTextPain.setColor(color);
+        }
+        invalidate();
     }
 }

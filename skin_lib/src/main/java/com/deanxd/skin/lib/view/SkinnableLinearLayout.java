@@ -9,7 +9,9 @@ import android.widget.LinearLayout;
 import androidx.core.content.ContextCompat;
 
 import com.deanxd.skin.lib.R;
+import com.deanxd.skin.lib.SkinManager;
 import com.deanxd.skin.lib.bean.AttrsBean;
+import com.deanxd.skin.lib.core.SkinResource;
 import com.deanxd.skin.lib.listener.ISkinnableView;
 
 public class SkinnableLinearLayout extends LinearLayout implements ISkinnableView {
@@ -35,11 +37,21 @@ public class SkinnableLinearLayout extends LinearLayout implements ISkinnableVie
 
     @Override
     public void updateSkin() {
-        int key = R.styleable.SkinnableLinearLayout[R.styleable.SkinnableLinearLayout_android_background];
+        //设置背景
+        int key = R.styleable.SkinnableButton[R.styleable.SkinnableButton_android_background];
         int backgroundResourceId = attrsBean.getViewResource(key);
         if (backgroundResourceId > 0) {
-            Drawable drawable = ContextCompat.getDrawable(getContext(), backgroundResourceId);
-            setBackground(drawable);
+
+            SkinResource skinResource = SkinManager.getSkinResource();
+            Object background = skinResource.getBackgroundOrSrc(backgroundResourceId);
+            // 兼容包转换
+            if (background instanceof Integer) {
+                int color = (int) background;
+                setBackgroundColor(color);
+            } else {
+                Drawable drawable = (Drawable) background;
+                setBackgroundDrawable(drawable);
+            }
         }
     }
 }

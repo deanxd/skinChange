@@ -10,7 +10,9 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.content.ContextCompat;
 
 import com.deanxd.skin.lib.R;
+import com.deanxd.skin.lib.SkinManager;
 import com.deanxd.skin.lib.bean.AttrsBean;
+import com.deanxd.skin.lib.core.SkinResource;
 import com.deanxd.skin.lib.listener.ISkinnableView;
 
 
@@ -49,20 +51,36 @@ public class SkinnableTextView extends AppCompatTextView implements ISkinnableVi
 
     @Override
     public void updateSkin() {
-        // 根据自定义属性，获取styleable中的background属性
-        int key = R.styleable.SkinnableTextView[R.styleable.SkinnableTextView_android_background];
+        SkinResource skinResource = SkinManager.getSkinResource();
+
+        //设置背景
+        int key = R.styleable.SkinnableButton[R.styleable.SkinnableButton_android_background];
         int backgroundResourceId = attrsBean.getViewResource(key);
         if (backgroundResourceId > 0) {
-            Drawable drawable = ContextCompat.getDrawable(getContext(), backgroundResourceId);
-            setBackgroundDrawable(drawable);
+            Object background = skinResource.getBackgroundOrSrc(backgroundResourceId);
+            // 兼容包转换
+            if (background instanceof Integer) {
+                int color = (int) background;
+                setBackgroundColor(color);
+            } else {
+                Drawable drawable = (Drawable) background;
+                setBackgroundDrawable(drawable);
+            }
         }
 
-        // 根据自定义属性，获取styleable中的textColor属性
-        key = R.styleable.SkinnableTextView[R.styleable.SkinnableTextView_android_textColor];
+        //设置字体颜色
+        key = R.styleable.SkinnableButton[R.styleable.SkinnableButton_android_textColor];
         int textColorResourceId = attrsBean.getViewResource(key);
         if (textColorResourceId > 0) {
-            ColorStateList color = ContextCompat.getColorStateList(getContext(), textColorResourceId);
+            ColorStateList color = skinResource.getColorStateList(textColorResourceId);
             setTextColor(color);
+        }
+
+        // 根据自定义属性，获取styleable中的字体 custom_typeface 属性
+        key = R.styleable.SkinnableTextView[R.styleable.SkinnableTextView_custom_typeface];
+        int textTypefaceResourceId = attrsBean.getViewResource(key);
+        if (textTypefaceResourceId > 0) {
+            setTypeface(skinResource.getTypeface(textTypefaceResourceId));
         }
     }
 }

@@ -18,6 +18,5 @@ public class SecondActivity extends BaseActivity {
 
     public void openActivity(View v) {
         startActivity(new Intent(this, ThirdActivity.class));
-
     }
 }

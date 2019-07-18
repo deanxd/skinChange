@@ -3,37 +3,57 @@ package com.deanxd.skin.lib;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
-import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.LayoutInflaterCompat;
 
 import com.deanxd.skin.lib.core.SkinFactory;
+import com.deanxd.skin.lib.core.SkinResource;
 import com.deanxd.skin.lib.listener.ISkinnableView;
 import com.deanxd.skin.lib.utils.ActionBarUtils;
 import com.deanxd.skin.lib.utils.NavigationUtils;
 import com.deanxd.skin.lib.utils.StatusBarUtils;
-import com.deanxd.skin.lib.view.SkinnableButton;
-import com.deanxd.skin.lib.view.SkinnableImageView;
-import com.deanxd.skin.lib.view.SkinnableLinearLayout;
-import com.deanxd.skin.lib.view.SkinnableRelativeLayout;
-import com.deanxd.skin.lib.view.SkinnableTextView;
 
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Iterator;
 
 public class SkinManager {
-
     private final static String TAG = "skin manager >>>";
 
-    private static HashSet<WeakReference<Activity>> mHashSet = new HashSet<>();
+    private static boolean mIsInit;
+    private static SkinResource mSkinResource;
+    private static HashSet<WeakReference<Activity>> mHashSet;
 
+    private static int mThemeColorId = -1;
+
+    public static void setThemeColorId(int themeColorId) {
+        mThemeColorId = themeColorId;
+    }
+
+    public static void init(Context context) {
+        mIsInit = true;
+        mHashSet = new HashSet<>();
+        mSkinResource = new SkinResource(context);
+    }
+
+    public static SkinResource getSkinResource() {
+        return mSkinResource;
+    }
+
+    /**
+     * 注册当前Activity, 皮肤改变时， 通知activity更新显示
+     * 1， 使用WeakReference 避免内存泄漏
+     */
     public static void register(Activity activity) {
+        checkIsInit();
+
         //为当前Activity设置 布局解析监听
         LayoutInflater inflater = LayoutInflater.from(activity);
         LayoutInflaterCompat.setFactory2(inflater, new SkinFactory(activity));
@@ -43,7 +63,12 @@ public class SkinManager {
         mHashSet.add(reference);
     }
 
+    /**
+     * Activity销毁时， 从集合中移除activity， 避免内存泄漏
+     */
     public static void unRegister(Activity activity) {
+        checkIsInit();
+
         Iterator<WeakReference<Activity>> iterator = mHashSet.iterator();
         while (iterator.hasNext()) {
             WeakReference<Activity> reference = iterator.next();
@@ -59,44 +84,96 @@ public class SkinManager {
         }
     }
 
-    public static void installSkin(String skinFilePath) {
-
-    }
-
-    public static void setDayNightMode(@AppCompatDelegate.NightMode int nightMode) {
-        notifySkinChanged(nightMode);
-    }
-
-
     /**
-     * 通知 皮肤改变
+     * 安装新皮肤包,并显示
      */
-    private static void notifySkinChanged(@AppCompatDelegate.NightMode int nightMode) {
-        final boolean isPost21 = Build.VERSION.SDK_INT >= 21;
-        for (WeakReference<Activity> reference : mHashSet) {
-            Activity activity = reference.get();
-            if (activity != null) {
-                if (activity instanceof AppCompatActivity) {
-                    if (isPost21) {
-                        ((AppCompatActivity) activity).getDelegate().setLocalNightMode(nightMode);
-                        ActionBarUtils.forActionBar((AppCompatActivity) activity);
-                    }
-                }
-                if (isPost21) {
-                    StatusBarUtils.forStatusBar(activity);
-                    NavigationUtils.forNavigation(activity);
-                }
+    public static void installSkin(String skinFilePath) {
+        checkIsInit();
 
-                View decorView = activity.getWindow().getDecorView();
-                applyDayNightForView(decorView);
-            }
+        boolean isSuccess = mSkinResource.loadSkin(skinFilePath);
+        if (isSuccess) {
+            notifySkinChanged();
+        }else{
+            Log.e(TAG, "loadSkin error");
         }
     }
 
     /**
-     * 循环view集合，根据当前配置 设置样式
+     * 显示默认皮肤
      */
-    private static void applyDayNightForView(View view) {
+    public static void showDefaultSkin() {
+        checkIsInit();
+
+        boolean isSuccess = mSkinResource.showDefaultSkin();
+        if (isSuccess) {
+            notifySkinChanged();
+        }
+    }
+
+    /**
+     * 设置日间模式、夜间模式
+     */
+    public static void setDayNightMode(@AppCompatDelegate.NightMode int nightMode) {
+        checkIsInit();
+
+        notifyDayNightModeChanged(nightMode);
+    }
+
+
+    private static void notifySkinChanged() {
+        for (WeakReference<Activity> reference : mHashSet) {
+            Activity activity = reference.get();
+            if (activity == null) {
+                continue;
+            }
+
+            if (Build.VERSION.SDK_INT >= 21 && mThemeColorId != -1) {
+                int themeColor = mSkinResource.getColor(mThemeColorId);
+                StatusBarUtils.forStatusBar(activity, themeColor);
+                NavigationUtils.forNavigation(activity, themeColor);
+
+                if (activity instanceof AppCompatActivity) {
+                    ActionBarUtils.forActionBar((AppCompatActivity) activity, themeColor);
+                }
+            }
+
+            View decorView = activity.getWindow().getDecorView();
+            updateViewsSkin(decorView);
+        }
+    }
+
+
+    /**
+     * 通知View 更新 日间模式、夜间模式
+     */
+    private static void notifyDayNightModeChanged(@AppCompatDelegate.NightMode int nightMode) {
+        final boolean isPost21 = Build.VERSION.SDK_INT >= 21;
+
+        for (WeakReference<Activity> reference : mHashSet) {
+            Activity activity = reference.get();
+            if (activity == null) {
+                continue;
+            }
+
+            if (isPost21) {
+                StatusBarUtils.forStatusBar(activity);
+                NavigationUtils.forNavigation(activity);
+
+                if (activity instanceof AppCompatActivity) {
+                    ((AppCompatActivity) activity).getDelegate().setLocalNightMode(nightMode);
+                    ActionBarUtils.forActionBar((AppCompatActivity) activity);
+                }
+            }
+
+            View decorView = activity.getWindow().getDecorView();
+            updateViewsSkin(decorView);
+        }
+    }
+
+    /**
+     * 根据当前皮肤设置，更新界面元素 显示
+     */
+    private static void updateViewsSkin(View view) {
         if (view instanceof ISkinnableView) {
             ISkinnableView viewsMatch = (ISkinnableView) view;
             viewsMatch.updateSkin();
@@ -106,8 +183,14 @@ public class SkinManager {
             ViewGroup parent = (ViewGroup) view;
             int childCount = parent.getChildCount();
             for (int i = 0; i < childCount; i++) {
-                applyDayNightForView(parent.getChildAt(i));
+                updateViewsSkin(parent.getChildAt(i));
             }
+        }
+    }
+
+    private static void checkIsInit() {
+        if (!mIsInit) {
+            throw new RuntimeException("please call init() first");
         }
     }
 }
