@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.LayoutInflaterCompat;
@@ -33,6 +32,7 @@ public class SkinManager {
 
     private static int mThemeColorId = -1;
 
+
     public static void setThemeColorId(int themeColorId) {
         mThemeColorId = themeColorId;
     }
@@ -47,9 +47,20 @@ public class SkinManager {
         return mSkinResource;
     }
 
+
     /**
      * 注册当前Activity, 皮肤改变时， 通知activity更新显示
-     * 1， 使用WeakReference 避免内存泄漏
+     * <p>
+     * 在Activity的onCreate(@Nullable Bundle savedInstanceState)方法中super.onCreate(savedInstanceState)语句之前调用
+     * 以便拦截注册InflatLayout布局解析监听
+     * <p>
+     * 例如：
+     * ---@Override
+     * ---protected void onCreate(@Nullable Bundle savedInstanceState) {
+     * ------SkinManager.register(this);
+     * ------super.onCreate(savedInstanceState);
+     * ------......
+     * ---}
      */
     public static void register(Activity activity) {
         checkIsInit();
@@ -93,7 +104,7 @@ public class SkinManager {
         boolean isSuccess = mSkinResource.loadSkin(skinFilePath);
         if (isSuccess) {
             notifySkinChanged();
-        }else{
+        } else {
             Log.e(TAG, "loadSkin error");
         }
     }
@@ -107,6 +118,25 @@ public class SkinManager {
         boolean isSuccess = mSkinResource.showDefaultSkin();
         if (isSuccess) {
             notifySkinChanged();
+        }
+    }
+
+    /**
+     * 更新主题
+     */
+    public static void updateSkinTheme(Activity activity) {
+        checkIsInit();
+
+        if (Build.VERSION.SDK_INT < 21 || mThemeColorId <= 0) {
+            return;
+        }
+
+        int themeColor = mSkinResource.getColor(mThemeColorId);
+        StatusBarUtils.forStatusBar(activity, themeColor);
+        NavigationUtils.forNavigation(activity, themeColor);
+
+        if (activity instanceof AppCompatActivity) {
+            ActionBarUtils.forActionBar((AppCompatActivity) activity, themeColor);
         }
     }
 
@@ -127,21 +157,12 @@ public class SkinManager {
                 continue;
             }
 
-            if (Build.VERSION.SDK_INT >= 21 && mThemeColorId != -1) {
-                int themeColor = mSkinResource.getColor(mThemeColorId);
-                StatusBarUtils.forStatusBar(activity, themeColor);
-                NavigationUtils.forNavigation(activity, themeColor);
-
-                if (activity instanceof AppCompatActivity) {
-                    ActionBarUtils.forActionBar((AppCompatActivity) activity, themeColor);
-                }
-            }
+            updateSkinTheme(activity);
 
             View decorView = activity.getWindow().getDecorView();
             updateViewsSkin(decorView);
         }
     }
-
 
     /**
      * 通知View 更新 日间模式、夜间模式

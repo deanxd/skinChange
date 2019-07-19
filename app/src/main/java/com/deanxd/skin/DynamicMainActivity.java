@@ -1,4 +1,4 @@
-package com.deanxd.skin.dynamic;
+package com.deanxd.skin;
 
 import android.Manifest;
 import android.content.Intent;
@@ -10,7 +10,6 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
-import com.deanxd.skin.R;
 import com.deanxd.skin.base.BaseActivity;
 import com.deanxd.skin.lib.SkinManager;
 

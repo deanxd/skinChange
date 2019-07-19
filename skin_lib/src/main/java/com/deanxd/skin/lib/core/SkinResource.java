@@ -16,12 +16,17 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
+/**
+ * 封装皮肤包加载 以及 皮肤资源解析的功能
+ */
 public class SkinResource {
 
     private final static String TAG = "skin load >>>";
     private final static String SKIN_DIR = "skin";
     private final static String SKIN_FILE_SUFFIX = ".skin";
     private final static String ADD_ASSET_PATH = "addAssetPath";
+
+    private final static int FLAG_RESOURCE_NOT_FOUND = -1;
 
     private Context mContext;
     private Resources mDefaultResource;
@@ -80,12 +85,12 @@ public class SkinResource {
 
     public int getColor(int colorId) {
         int resourceId = getRealResourceId(colorId);
-        Resources cacheResource = getCacheResource();
-        try {
-            return cacheResource.getColor(resourceId);
-        } catch (Exception e) {
+
+        if (resourceId == FLAG_RESOURCE_NOT_FOUND) {
+            return mDefaultResource.getColor(colorId);
         }
-        return mDefaultResource.getColor(resourceId);
+
+        return getCacheResource().getColor(resourceId);
     }
 
     /**
@@ -94,33 +99,32 @@ public class SkinResource {
      */
     public Drawable getDrawableOrMipMap(int drawableId) {
         int resourceId = getRealResourceId(drawableId);
-        Resources cacheResource = getCacheResource();
-        try {
-            return cacheResource.getDrawable(resourceId);
-        } catch (Exception e) {
+
+        if (resourceId == FLAG_RESOURCE_NOT_FOUND) {
+            return mDefaultResource.getDrawable(drawableId);
         }
-        return mDefaultResource.getDrawable(resourceId);
+
+        return getCacheResource().getDrawable(resourceId);
     }
 
     public String getString(int stringId) {
         int resourceId = getRealResourceId(stringId);
-        Resources cacheResource = getCacheResource();
-        try {
-            return cacheResource.getString(resourceId);
-        } catch (Exception e) {
+
+        if (resourceId == FLAG_RESOURCE_NOT_FOUND) {
+            return mDefaultResource.getString(stringId);
         }
-        return mDefaultResource.getString(resourceId);
+
+        return getCacheResource().getString(resourceId);
     }
 
-    public ColorStateList getColorStateList(int resourceId) {
-        int ids = getRealResourceId(resourceId);
-        Resources cacheResource = getCacheResource();
-        try {
-            return cacheResource.getColorStateList(resourceId);
-        } catch (Exception e) {
-            e.printStackTrace();
+    public ColorStateList getColorStateList(int ids) {
+        int resourceId = getRealResourceId(ids);
+
+        if (resourceId == FLAG_RESOURCE_NOT_FOUND) {
+            return mDefaultResource.getColorStateList(ids);
         }
-        return mDefaultResource.getColorStateList(resourceId);
+
+        return getCacheResource().getColorStateList(resourceId);
     }
 
     /**
@@ -212,7 +216,7 @@ public class SkinResource {
 
         if (identifier == 0) {
             //皮肤包内 未找到当前资源
-            return resId;
+            return FLAG_RESOURCE_NOT_FOUND;
         }
         return identifier;
     }

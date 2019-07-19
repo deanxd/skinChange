@@ -45,7 +45,7 @@ public class SkinnableImageView extends AppCompatImageView implements ISkinnable
     public void updateSkin() {
         SkinResource skinResource = SkinManager.getSkinResource();
         //设置背景
-        int key = R.styleable.SkinnableButton[R.styleable.SkinnableButton_android_background];
+        int key = R.styleable.SkinnableImageView[R.styleable.SkinnableImageView_android_background];
         int backgroundResourceId = attrsBean.getViewResource(key);
         if (backgroundResourceId > 0) {
             Object background = skinResource.getBackgroundOrSrc(backgroundResourceId);

@@ -15,7 +15,6 @@ import com.deanxd.skin.lib.bean.AttrsBean;
 import com.deanxd.skin.lib.core.SkinResource;
 import com.deanxd.skin.lib.listener.ISkinnableView;
 
-
 /**
  * 继承TextView兼容包，9.0源码中也是如此
  * 参考：AppCompatViewInflater.java
@@ -35,7 +34,6 @@ public class SkinnableTextView extends AppCompatTextView implements ISkinnableVi
 
     public SkinnableTextView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-
         attrsBean = new AttrsBean();
 
         // 根据自定义属性，匹配控件属性的类型集合，如：background + textColor
@@ -54,7 +52,7 @@ public class SkinnableTextView extends AppCompatTextView implements ISkinnableVi
         SkinResource skinResource = SkinManager.getSkinResource();
 
         //设置背景
-        int key = R.styleable.SkinnableButton[R.styleable.SkinnableButton_android_background];
+        int key = R.styleable.SkinnableTextView[R.styleable.SkinnableTextView_android_background];
         int backgroundResourceId = attrsBean.getViewResource(key);
         if (backgroundResourceId > 0) {
             Object background = skinResource.getBackgroundOrSrc(backgroundResourceId);
@@ -69,7 +67,7 @@ public class SkinnableTextView extends AppCompatTextView implements ISkinnableVi
         }
 
         //设置字体颜色
-        key = R.styleable.SkinnableButton[R.styleable.SkinnableButton_android_textColor];
+        key = R.styleable.SkinnableTextView[R.styleable.SkinnableTextView_android_textColor];
         int textColorResourceId = attrsBean.getViewResource(key);
         if (textColorResourceId > 0) {
             ColorStateList color = skinResource.getColorStateList(textColorResourceId);

@@ -45,6 +45,29 @@ public class SkinnableButton extends AppCompatButton implements ISkinnableView {
         }
     }
 
+
+    @Override
+    public void setTextColor(int color) {
+        super.setTextColor(color);
+    }
+
+    @Override
+    public void setTextColor(ColorStateList colors) {
+        super.setTextColor(colors);
+    }
+
+    @Override
+    public void setBackgroundResource(int resId) {
+        super.setBackgroundResource(resId);
+    }
+
+    @Override
+    public void setBackgroundColor(int color) {
+        super.setBackgroundColor(color);
+    }
+
+
+
     @Override
     public void updateSkin() {
 
@@ -74,7 +97,7 @@ public class SkinnableButton extends AppCompatButton implements ISkinnableView {
         }
 
         // 根据自定义属性，获取styleable中的字体 custom_typeface 属性
-        key = R.styleable.SkinnableTextView[R.styleable.SkinnableTextView_custom_typeface];
+        key = R.styleable.SkinnableButton[R.styleable.SkinnableButton_custom_typeface];
         int textTypefaceResourceId = attrsBean.getViewResource(key);
         if (textTypefaceResourceId > 0) {
             setTypeface(skinResource.getTypeface(textTypefaceResourceId));

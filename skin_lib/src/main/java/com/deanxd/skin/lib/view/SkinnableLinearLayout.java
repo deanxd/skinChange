@@ -38,7 +38,7 @@ public class SkinnableLinearLayout extends LinearLayout implements ISkinnableVie
     @Override
     public void updateSkin() {
         //设置背景
-        int key = R.styleable.SkinnableButton[R.styleable.SkinnableButton_android_background];
+        int key = R.styleable.SkinnableImageView[R.styleable.SkinnableImageView_android_src];
         int backgroundResourceId = attrsBean.getViewResource(key);
         if (backgroundResourceId > 0) {
 

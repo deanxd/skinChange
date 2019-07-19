@@ -38,7 +38,7 @@ public class SkinnableRelativeLayout extends RelativeLayout implements ISkinnabl
     @Override
     public void updateSkin() {
         //设置背景
-        int key = R.styleable.SkinnableButton[R.styleable.SkinnableButton_android_background];
+        int key = R.styleable.SkinnableRelativeLayout[R.styleable.SkinnableRelativeLayout_android_background];
         int backgroundResourceId = attrsBean.getViewResource(key);
         if (backgroundResourceId > 0) {
 

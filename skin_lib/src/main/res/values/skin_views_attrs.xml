@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- TextView控件属性 -->
+    <!--SkinnableView 可以响应换肤操作的View 属性-->
     <declare-styleable name="SkinnableTextView">
         <attr name="android:background" />
         <attr name="android:textColor" />
+
         <!-- 字体属性 -->
         <attr name="custom_typeface" />
+
     </declare-styleable>
+
 
     <!-- Button控件继承TextView，此处parent语法通过，但无效果，不像style.xml -->
     <declare-styleable name="SkinnableButton">
@@ -20,6 +23,7 @@
     <!-- ImageView控件特有属性 -->
     <declare-styleable name="SkinnableImageView">
         <attr name="android:src" />
+        <attr name="android:background" />
     </declare-styleable>
 
     <!-- SkinnableLinearLayout控件 -->

@@ -24,11 +24,11 @@ public class CustomCircleView extends View implements ISkinnableView {
         this(context, null);
     }
 
-    public CustomCircleView(Context context,  AttributeSet attrs) {
+    public CustomCircleView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public CustomCircleView(Context context,  AttributeSet attrs, int defStyleAttr) {
+    public CustomCircleView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
         attrsBean = new AttrsBean();
@@ -46,7 +46,8 @@ public class CustomCircleView extends View implements ISkinnableView {
         typedArray.recycle();
 
         mTextPain = new Paint();
-        mTextPain.setColor(getResources().getColor(corcleColorResId));
+        mTextPain.setColor(getPaintColor(corcleColorResId));
+
         //开启抗锯齿，平滑文字和圆弧的边缘
         mTextPain.setAntiAlias(true);
         //设置文本位于相对于原点的中间
@@ -72,10 +73,13 @@ public class CustomCircleView extends View implements ISkinnableView {
         int key = R.styleable.CustomCircleView[0]; // = R.styleable.CustomCircleView_circleColor
         int resourceId = attrsBean.getViewResource(key);
         if (resourceId > 0) {
-            SkinResource skinResource = SkinManager.getSkinResource();
-            int color = skinResource.getColor(resourceId);
-            mTextPain.setColor(color);
+            mTextPain.setColor(getPaintColor(resourceId));
         }
         invalidate();
+    }
+
+    private int getPaintColor(int resourceId) {
+        SkinResource skinResource = SkinManager.getSkinResource();
+        return skinResource.getColor(resourceId);
     }
 }
