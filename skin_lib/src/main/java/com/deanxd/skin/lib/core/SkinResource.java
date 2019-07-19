@@ -10,7 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.deanxd.skin.lib.R;
 import com.deanxd.skin.lib.utils.FileUtils;
 
 import java.io.File;
@@ -83,9 +82,8 @@ public class SkinResource {
         int resourceId = getRealResourceId(colorId);
         Resources cacheResource = getCacheResource();
         try {
-            cacheResource.getColor(resourceId);
+            return cacheResource.getColor(resourceId);
         } catch (Exception e) {
-            e.printStackTrace();
         }
         return mDefaultResource.getColor(resourceId);
     }
@@ -100,7 +98,6 @@ public class SkinResource {
         try {
             return cacheResource.getDrawable(resourceId);
         } catch (Exception e) {
-            e.printStackTrace();
         }
         return mDefaultResource.getDrawable(resourceId);
     }
@@ -111,7 +108,6 @@ public class SkinResource {
         try {
             return cacheResource.getString(resourceId);
         } catch (Exception e) {
-            e.printStackTrace();
         }
         return mDefaultResource.getString(resourceId);
     }
@@ -212,7 +208,7 @@ public class SkinResource {
         //资源类型： drawable
         String resourceType = mDefaultResource.getResourceTypeName(resId);
 
-        int identifier = resources.getIdentifier(resourceType, resourceName, mCurrentSKinPackageName);
+        int identifier = resources.getIdentifier(resourceName, resourceType, mCurrentSKinPackageName);
 
         if (identifier == 0) {
             //皮肤包内 未找到当前资源

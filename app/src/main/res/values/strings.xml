@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NetEase_Skin_Dynamic</string>
+    <string name="app_name">Skin_Dynamic</string>
 
     <!-- 字体包路径（皮肤包内） -->
     <string name="custom_typeface_string" />

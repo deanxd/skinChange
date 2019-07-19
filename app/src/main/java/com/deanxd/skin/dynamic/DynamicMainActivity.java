@@ -33,7 +33,8 @@ public class DynamicMainActivity extends BaseActivity {
             }
         }
 
-        skinFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "red_skin.skin";
+        skinFilePath = Environment.getExternalStorageDirectory().getAbsolutePath()
+                + File.separator + "red_skin.skin";
     }
 
     public void skinDynamic(View view) {
