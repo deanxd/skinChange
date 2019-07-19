@@ -79,7 +79,6 @@ public class CustomCircleView extends View implements ISkinnableView {
     }
 
     private int getPaintColor(int resourceId) {
-        SkinResource skinResource = SkinManager.getSkinResource();
-        return skinResource.getColor(resourceId);
+        return SkinManager.getInstance().getColor(resourceId);
     }
 }

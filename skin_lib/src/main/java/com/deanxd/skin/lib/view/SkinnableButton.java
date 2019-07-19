@@ -71,13 +71,13 @@ public class SkinnableButton extends AppCompatButton implements ISkinnableView {
     @Override
     public void updateSkin() {
 
-        SkinResource skinResource = SkinManager.getSkinResource();
+        SkinManager skinManager = SkinManager.getInstance();
 
         //设置背景
         int key = R.styleable.SkinnableButton[R.styleable.SkinnableButton_android_background];
         int backgroundResourceId = attrsBean.getViewResource(key);
         if (backgroundResourceId > 0) {
-            Object background = skinResource.getBackgroundOrSrc(backgroundResourceId);
+            Object background = skinManager.getBackgroundOrSrc(backgroundResourceId);
             // 兼容包转换
             if (background instanceof Integer) {
                 int color = (int) background;
@@ -92,7 +92,7 @@ public class SkinnableButton extends AppCompatButton implements ISkinnableView {
         key = R.styleable.SkinnableButton[R.styleable.SkinnableButton_android_textColor];
         int textColorResourceId = attrsBean.getViewResource(key);
         if (textColorResourceId > 0) {
-            ColorStateList color = skinResource.getColorStateList(textColorResourceId);
+            ColorStateList color = skinManager.getColorStateList(textColorResourceId);
             setTextColor(color);
         }
 
@@ -100,7 +100,7 @@ public class SkinnableButton extends AppCompatButton implements ISkinnableView {
         key = R.styleable.SkinnableButton[R.styleable.SkinnableButton_custom_typeface];
         int textTypefaceResourceId = attrsBean.getViewResource(key);
         if (textTypefaceResourceId > 0) {
-            setTypeface(skinResource.getTypeface(textTypefaceResourceId));
+            setTypeface(skinManager.getTypeface(textTypefaceResourceId));
         }
     }
 }

@@ -43,12 +43,13 @@ public class SkinnableImageView extends AppCompatImageView implements ISkinnable
 
     @Override
     public void updateSkin() {
-        SkinResource skinResource = SkinManager.getSkinResource();
+        SkinManager skinManager = SkinManager.getInstance();
+
         //设置背景
         int key = R.styleable.SkinnableImageView[R.styleable.SkinnableImageView_android_background];
         int backgroundResourceId = attrsBean.getViewResource(key);
         if (backgroundResourceId > 0) {
-            Object background = skinResource.getBackgroundOrSrc(backgroundResourceId);
+            Object background = skinManager.getBackgroundOrSrc(backgroundResourceId);
             // 兼容包转换
             if (background instanceof Integer) {
                 int color = (int) background;
@@ -65,7 +66,7 @@ public class SkinnableImageView extends AppCompatImageView implements ISkinnable
         int srcResourceId = attrsBean.getViewResource(key);
         if (srcResourceId > 0) {
             // 获取皮肤包资源
-            Object skinResourceId = skinResource.getBackgroundOrSrc(srcResourceId);
+            Object skinResourceId = skinManager.getBackgroundOrSrc(srcResourceId);
             // 兼容包转换
             if (skinResourceId instanceof Integer) {
                 int color = (int) skinResourceId;

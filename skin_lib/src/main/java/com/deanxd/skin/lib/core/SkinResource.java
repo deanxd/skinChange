@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.deanxd.skin.lib.listener.IResourceParser;
 import com.deanxd.skin.lib.utils.FileUtils;
 
 import java.io.File;
@@ -19,7 +20,7 @@ import java.util.HashMap;
 /**
  * 封装皮肤包加载 以及 皮肤资源解析的功能
  */
-public class SkinResource {
+public class SkinResource implements IResourceParser {
 
     private final static String TAG = "skin load >>>";
     private final static String SKIN_DIR = "skin";
@@ -83,6 +84,7 @@ public class SkinResource {
         return true;
     }
 
+    @Override
     public int getColor(int colorId) {
         int resourceId = getRealResourceId(colorId);
 
@@ -97,6 +99,7 @@ public class SkinResource {
      * TODO
      * mipmap和drawable统一用法（待测）
      */
+    @Override
     public Drawable getDrawableOrMipMap(int drawableId) {
         int resourceId = getRealResourceId(drawableId);
 
@@ -107,6 +110,7 @@ public class SkinResource {
         return getCacheResource().getDrawable(resourceId);
     }
 
+    @Override
     public String getString(int stringId) {
         int resourceId = getRealResourceId(stringId);
 
@@ -117,6 +121,7 @@ public class SkinResource {
         return getCacheResource().getString(resourceId);
     }
 
+    @Override
     public ColorStateList getColorStateList(int ids) {
         int resourceId = getRealResourceId(ids);
 
@@ -130,6 +135,7 @@ public class SkinResource {
     /**
      * @return 返回值特殊情况, 可能是color / drawable / mipmap
      */
+    @Override
     public Object getBackgroundOrSrc(int resourceId) {
         // 根据当前属性的类型名ResourceTypeName判断
         String resourceTypeName = mDefaultResource.getResourceTypeName(resourceId);
@@ -149,6 +155,7 @@ public class SkinResource {
     /**
      * 获得字体
      */
+    @Override
     public Typeface getTypeface(int resourceId) {
         // 通过资源ID获取资源path，参考：resources.arsc资源映射表
         String skinTypefacePath = getString(resourceId);

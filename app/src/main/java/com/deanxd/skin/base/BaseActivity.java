@@ -9,16 +9,25 @@ import com.deanxd.skin.lib.SkinManager;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
+    private SkinManager skinManager;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        SkinManager.register(this);
+        skinManager = SkinManager.getInstance();
+        skinManager.register(this);
         super.onCreate(savedInstanceState);
-        SkinManager.updateSkinTheme(this);
+
+        setContentView(getLayoutId());
+
+        skinManager.applySkinConfig(this);
     }
+
+    protected abstract int getLayoutId();
+
 
     @Override
     protected void onDestroy() {
-        SkinManager.unRegister(this);
+        skinManager.unRegister(this);
         super.onDestroy();
     }
 }

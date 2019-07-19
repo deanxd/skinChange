@@ -9,6 +9,6 @@ public class MApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        SkinManager.init(getApplicationContext());
+        SkinManager.getInstance().init(getApplicationContext());
     }
 }

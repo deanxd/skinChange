@@ -42,8 +42,8 @@ public class SkinnableLinearLayout extends LinearLayout implements ISkinnableVie
         int backgroundResourceId = attrsBean.getViewResource(key);
         if (backgroundResourceId > 0) {
 
-            SkinResource skinResource = SkinManager.getSkinResource();
-            Object background = skinResource.getBackgroundOrSrc(backgroundResourceId);
+            SkinManager skinManager = SkinManager.getInstance();
+            Object background = skinManager.getBackgroundOrSrc(backgroundResourceId);
             // 兼容包转换
             if (background instanceof Integer) {
                 int color = (int) background;

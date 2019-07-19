@@ -2,6 +2,9 @@ package com.deanxd.skin.lib;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +17,7 @@ import androidx.core.view.LayoutInflaterCompat;
 
 import com.deanxd.skin.lib.core.SkinFactory;
 import com.deanxd.skin.lib.core.SkinResource;
+import com.deanxd.skin.lib.listener.IResourceParser;
 import com.deanxd.skin.lib.listener.ISkinnableView;
 import com.deanxd.skin.lib.utils.ActionBarUtils;
 import com.deanxd.skin.lib.utils.NavigationUtils;
@@ -23,30 +27,40 @@ import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Iterator;
 
-public class SkinManager {
+public class SkinManager implements IResourceParser {
     private final static String TAG = "skin manager >>>";
 
-    private static boolean mIsInit;
-    private static SkinResource mSkinResource;
-    private static HashSet<WeakReference<Activity>> mHashSet;
+    private boolean mIsInit;
+    private SkinResource mSkinResource;
+    private HashSet<WeakReference<Activity>> mHashSet;
 
-    private static int mThemeColorId = -1;
+    private int mThemeColorId = -1;
 
+    private static SkinManager mSkinManager;
 
-    public static void setThemeColorId(int themeColorId) {
+    private SkinManager() {
+    }
+
+    public static SkinManager getInstance() {
+        if (mSkinManager == null) {
+            synchronized (SkinManager.class) {
+                if (mSkinManager == null) {
+                    mSkinManager = new SkinManager();
+                }
+            }
+        }
+        return mSkinManager;
+    }
+
+    public void setThemeColorId(int themeColorId) {
         mThemeColorId = themeColorId;
     }
 
-    public static void init(Context context) {
+    public void init(Context context) {
         mIsInit = true;
         mHashSet = new HashSet<>();
         mSkinResource = new SkinResource(context);
     }
-
-    public static SkinResource getSkinResource() {
-        return mSkinResource;
-    }
-
 
     /**
      * 注册当前Activity, 皮肤改变时， 通知activity更新显示
@@ -62,7 +76,7 @@ public class SkinManager {
      * ------......
      * ---}
      */
-    public static void register(Activity activity) {
+    public void register(Activity activity) {
         checkIsInit();
 
         //为当前Activity设置 布局解析监听
@@ -77,7 +91,7 @@ public class SkinManager {
     /**
      * Activity销毁时， 从集合中移除activity， 避免内存泄漏
      */
-    public static void unRegister(Activity activity) {
+    public void unRegister(Activity activity) {
         checkIsInit();
 
         Iterator<WeakReference<Activity>> iterator = mHashSet.iterator();
@@ -98,7 +112,7 @@ public class SkinManager {
     /**
      * 安装新皮肤包,并显示
      */
-    public static void installSkin(String skinFilePath) {
+    public void installSkin(String skinFilePath) {
         checkIsInit();
 
         boolean isSuccess = mSkinResource.loadSkin(skinFilePath);
@@ -112,7 +126,7 @@ public class SkinManager {
     /**
      * 显示默认皮肤
      */
-    public static void showDefaultSkin() {
+    public void showDefaultSkin() {
         checkIsInit();
 
         boolean isSuccess = mSkinResource.showDefaultSkin();
@@ -124,9 +138,53 @@ public class SkinManager {
     /**
      * 更新主题
      */
-    public static void updateSkinTheme(Activity activity) {
+    public void applySkinConfig(Activity activity) {
         checkIsInit();
 
+        long currentTimeMillis = System.currentTimeMillis();
+
+        applySkinTheme(activity);
+        applyActivitySkin(activity);
+
+        Log.e(TAG, "applySkinConfig cost:" + (System.currentTimeMillis() - currentTimeMillis));
+    }
+
+    /**
+     * 设置日间模式、夜间模式
+     */
+    public void setDayNightMode(@AppCompatDelegate.NightMode int nightMode) {
+        checkIsInit();
+        notifyDayNightModeChanged(nightMode);
+    }
+
+
+    private void notifySkinChanged() {
+        long currentTimeMillis = System.currentTimeMillis();
+
+        for (WeakReference<Activity> reference : mHashSet) {
+            Activity activity = reference.get();
+            if (activity == null) {
+                continue;
+            }
+            applySkinTheme(activity);
+            applyActivitySkin(activity);
+        }
+
+        Log.e(TAG, "notifySkinChanged cost:" + (System.currentTimeMillis() - currentTimeMillis));
+    }
+
+    /**
+     * 遍历该Activity 布局View, 应用当前皮肤配置
+     */
+    private void applyActivitySkin(Activity activity) {
+        View decorView = activity.getWindow().getDecorView();
+        updateViewsSkin(decorView);
+    }
+
+    /**
+     * 根据当前皮肤配置，更新Activity主题
+     */
+    private void applySkinTheme(Activity activity) {
         if (Build.VERSION.SDK_INT < 21 || mThemeColorId <= 0) {
             return;
         }
@@ -141,33 +199,9 @@ public class SkinManager {
     }
 
     /**
-     * 设置日间模式、夜间模式
-     */
-    public static void setDayNightMode(@AppCompatDelegate.NightMode int nightMode) {
-        checkIsInit();
-
-        notifyDayNightModeChanged(nightMode);
-    }
-
-
-    private static void notifySkinChanged() {
-        for (WeakReference<Activity> reference : mHashSet) {
-            Activity activity = reference.get();
-            if (activity == null) {
-                continue;
-            }
-
-            updateSkinTheme(activity);
-
-            View decorView = activity.getWindow().getDecorView();
-            updateViewsSkin(decorView);
-        }
-    }
-
-    /**
      * 通知View 更新 日间模式、夜间模式
      */
-    private static void notifyDayNightModeChanged(@AppCompatDelegate.NightMode int nightMode) {
+    private void notifyDayNightModeChanged(@AppCompatDelegate.NightMode int nightMode) {
         final boolean isPost21 = Build.VERSION.SDK_INT >= 21;
 
         for (WeakReference<Activity> reference : mHashSet) {
@@ -194,7 +228,7 @@ public class SkinManager {
     /**
      * 根据当前皮肤设置，更新界面元素 显示
      */
-    private static void updateViewsSkin(View view) {
+    private void updateViewsSkin(View view) {
         if (view instanceof ISkinnableView) {
             ISkinnableView viewsMatch = (ISkinnableView) view;
             viewsMatch.updateSkin();
@@ -209,9 +243,51 @@ public class SkinManager {
         }
     }
 
-    private static void checkIsInit() {
+    private void checkIsInit() {
         if (!mIsInit) {
             throw new RuntimeException("please call init() first");
         }
+    }
+
+    @Override
+    public int getColor(int colorId) {
+        checkIsInit();
+
+        return mSkinResource.getColor(colorId);
+    }
+
+    @Override
+    public Drawable getDrawableOrMipMap(int drawableId) {
+        checkIsInit();
+
+        return mSkinResource.getDrawableOrMipMap(drawableId);
+    }
+
+    @Override
+    public String getString(int stringId) {
+        checkIsInit();
+
+        return mSkinResource.getString(stringId);
+    }
+
+    @Override
+    public ColorStateList getColorStateList(int ids) {
+        checkIsInit();
+
+        return mSkinResource.getColorStateList(ids);
+    }
+
+    @Override
+    public Object getBackgroundOrSrc(int resourceId) {
+        checkIsInit();
+
+        return mSkinResource.getBackgroundOrSrc(resourceId);
+    }
+
+    @Override
+    public Typeface getTypeface(int resourceId) {
+        checkIsInit();
+
+        return mSkinResource.getTypeface(resourceId);
     }
 }

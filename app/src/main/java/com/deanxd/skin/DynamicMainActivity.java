@@ -22,8 +22,6 @@ public class DynamicMainActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dynamic_main);
-
         // 运行时权限申请（6.0+）
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             String[] perms = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -31,19 +29,26 @@ public class DynamicMainActivity extends BaseActivity {
                 requestPermissions(perms, 200);
             }
         }
-
         skinFilePath = Environment.getExternalStorageDirectory().getAbsolutePath()
                 + File.separator + "red_skin.skin";
     }
 
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_dynamic_main;
+    }
+
     public void skinDynamic(View view) {
-        SkinManager.setThemeColorId(R.color.skin_item_color);
-        SkinManager.installSkin(skinFilePath);
+        SkinManager skinManager = SkinManager.getInstance();
+        skinManager.setThemeColorId(R.color.skin_item_color);
+        skinManager.installSkin(skinFilePath);
     }
 
     public void skinDefault(View view) {
-        SkinManager.setThemeColorId(R.color.colorPrimary);
-        SkinManager.showDefaultSkin();
+        SkinManager skinManager = SkinManager.getInstance();
+
+        skinManager.setThemeColorId(R.color.colorPrimary);
+        skinManager.showDefaultSkin();
     }
 
     public void jumpSelf(View view) {
