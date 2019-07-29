@@ -3,4 +3,6 @@
 
     <!-- 字体包路径（皮肤包内） -->
     <string name="custom_typeface_string" />
+
+    <string name="text_test_name">这是来自App的内容</string>
 </resources>

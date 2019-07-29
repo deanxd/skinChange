@@ -1,11 +1,14 @@
 package com.deanxd.skin.base;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.deanxd.skin.lib.SkinManager;
+
 
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -22,8 +25,13 @@ public abstract class BaseActivity extends AppCompatActivity {
         skinManager.applySkinConfig(this);
     }
 
-    protected abstract int getLayoutId();
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(newBase);
+//        SkinRManager.getInstance().createActivityResourceProxy(newBase);
+    }
 
+    protected abstract int getLayoutId();
 
     @Override
     protected void onDestroy() {

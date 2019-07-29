@@ -20,7 +20,7 @@ import java.util.HashMap;
 /**
  * 封装皮肤包加载 以及 皮肤资源解析的功能
  */
-public class SkinResource implements IResourceParser {
+public class  SkinResource implements IResourceParser {
 
     private final static String TAG = "skin load >>>";
     private final static String SKIN_DIR = "skin";

@@ -42,6 +42,10 @@ public class DynamicMainActivity extends BaseActivity {
         SkinManager skinManager = SkinManager.getInstance();
         skinManager.setThemeColorId(R.color.skin_item_color);
         skinManager.installSkin(skinFilePath);
+
+//        SkinRManager skinManager = SkinRManager.getInstance();
+//        skinManager.setThemeColorId(R.color.skin_item_color);
+//        skinManager.installSkin(skinFilePath);
     }
 
     public void skinDefault(View view) {
@@ -49,6 +53,10 @@ public class DynamicMainActivity extends BaseActivity {
 
         skinManager.setThemeColorId(R.color.colorPrimary);
         skinManager.showDefaultSkin();
+
+//        SkinRManager skinManager = SkinRManager.getInstance();
+//        skinManager.setThemeColorId(R.color.colorPrimary);
+//        skinManager.showDefaultSkin();
     }
 
     public void jumpSelf(View view) {
